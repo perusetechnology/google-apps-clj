@@ -160,6 +160,7 @@
                 :type    PermissionType
                 :value   t/Str}
     :optional {:with-link? t/Bool
+               :email? t/Bool
                :fields     FieldList}
     :complete? true))
 
@@ -503,8 +504,8 @@
 
 (t/ann PermissionInsertQuery->DriveRequest [Drive PermissionInsertQuery -> Drive$Permissions$Insert])
 (defn PermissionInsertQuery->DriveRequest
-  [^Drive drive-service, qmap]
-  (let [{:keys [file-id value role type with-link?]} qmap
+  [^Drive drive-service qmap]
+  (let [{:keys [file-id value role type with-link? email?]} qmap
         permission (new Permission)]
     ;build up the Java permission object
     (.setValue permission value)
@@ -514,9 +515,9 @@
     ;now make the request
     (let [permission-svc (.permissions drive-service)
           request (.insert permission-svc file-id permission)]
-      ;TODO: make sendNotificationEmails configurable via qmap?
-      (.setSendNotificationEmails request false)
-      (when-let [fields (format-fields-string qmap)] (.setFields request fields))
+      (cond-> request email? (.setSendNotificationEmails true))
+      (when-let [fields (format-fields-string qmap)]
+        (.setFields request fields))
       request)))
 
 ;; Alter a permission on a file/folder
@@ -821,7 +822,7 @@
    This operation should be idempotent until the the permissions change by some
    other operation."
   [google-ctx file-id authorization]
-  (let [{:keys [principal role searchable?]} authorization
+  (let [{:keys [principal role searchable? email?]} authorization
         extant (get-permissions! google-ctx file-id principal)
         principal-id (atom nil)                             ; TODO this could be a volatile
         ids-to-delete (atom [])]
@@ -834,7 +835,8 @@
         (reset! principal-id (:id permission))
         (swap! ids-to-delete conj (:id permission))))
     (let [deletes (map (partial permission-delete-query file-id) @ids-to-delete)
-          insert (when-not @principal-id (permission-insert-query file-id principal role {:with-link? searchable? :fields [:id]}))]
+          insert (when-not @principal-id (permission-insert-query file-id principal role {:email? email?
+                                                                                          :with-link? searchable? :fields [:id]}))]
       (execute! google-ctx deletes)
       (when insert
         (execute-query! google-ctx insert)))
