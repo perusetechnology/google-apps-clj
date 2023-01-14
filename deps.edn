@@ -7,4 +7,7 @@
         com.google.oauth-client/google-oauth-client-jetty {:mvn/version "1.22.0"}
         com.google.gdata/core {:mvn/version "1.47.1" :exclusions [org.apache.httpcomponents/httpclient
                                                                   org.mortbay.jetty/jetty
-                                                                  com.google.code.findbugs/jsr305]}}}
+                                                                  com.google.code.findbugs/jsr305]}}
+ :paths ["src"]
+ :aliases
+ {:env/test {:extra-paths ["test"]}}}
