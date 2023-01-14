@@ -24,18 +24,17 @@
       Drive$Builder
       Drive$Files$Delete
       Drive$Files$Get
-      Drive$Files$Insert
+      Drive$Files$Create
       Drive$Files$List
       Drive$Files$Update
       Drive$Permissions$Delete
-      Drive$Permissions$Insert
+      Drive$Permissions$Create
       Drive$Permissions$List
       Drive$Permissions$Update
       DriveRequest)
     (com.google.api.services.drive.model
       File
       FileList
-      ParentReference
       Permission
       PermissionList)))
 
@@ -49,19 +48,20 @@
 (t/non-nil-return com.google.api.services.drive.Drive/files :all)
 (t/non-nil-return com.google.api.services.drive.Drive$Files/delete :all)
 (t/non-nil-return com.google.api.services.drive.Drive$Files/get :all)
-(t/non-nil-return com.google.api.services.drive.Drive$Files/insert :all)
+(t/non-nil-return com.google.api.services.drive.Drive$Files/create :all)
 (t/non-nil-return com.google.api.services.drive.Drive$Files/list :all)
 (t/non-nil-return com.google.api.services.drive.Drive$Files/update :all)
 
 (t/non-nil-return com.google.api.services.drive.Drive/permissions :all)
 (t/non-nil-return com.google.api.services.drive.Drive$Permissions/delete :all)
-(t/non-nil-return com.google.api.services.drive.Drive$Permissions/insert :all)
+(t/non-nil-return com.google.api.services.drive.Drive$Permissions/create :all)
 (t/non-nil-return com.google.api.services.drive.Drive$Permissions/list :all)
 (t/non-nil-return com.google.api.services.drive.Drive$Permissions/update :all)
 
 ;; Basic helper methods
 ;; TODO: consider moving to a `util` namespace if it's not google-drive specific?
 
+#_:clj-kondo/ignore
 (t/ann bool? [t/Any -> t/Bool])
 (defn bool? [v]
   (or (true? v) (false? v)))
@@ -69,15 +69,23 @@
 
 ;; Basic shared data types
 
+#_:clj-kondo/ignore
 (t/defalias FileId t/Str)
+#_:clj-kondo/ignore
 (t/defalias FolderId t/Str)
+#_:clj-kondo/ignore
 (t/defalias FieldList (t/Seqable (t/U t/Keyword t/Str)))
+#_:clj-kondo/ignore
 (t/defalias FileUploadContent t/Any)
+#_:clj-kondo/ignore
 (t/defalias PermissionId t/Str)
+#_:clj-kondo/ignore
 (t/defalias Role (t/U ':owner ':writer ':reader))
+#_:clj-kondo/ignore
 (t/defalias PermissionType (t/U nil ':user ':group ':domain ':anyone))
 
 
+#_:clj-kondo/ignore
 (t/defalias FileDeleteQuery
   (t/HMap
     :mandatory {:model   ':files
@@ -85,6 +93,7 @@
                 :file-id FileId}
     :complete? true))
 
+#_:clj-kondo/ignore
 (t/defalias FileListQuery
   (t/HMap
     :mandatory {:model  ':files
@@ -93,6 +102,7 @@
                :fields FieldList}
     :complete? true))
 
+#_:clj-kondo/ignore
 (t/defalias FileGetQuery
   (t/HMap
     :mandatory {:model   ':files
@@ -101,10 +111,11 @@
     :optional {:fields FieldList}
     :complete? true))
 
-(t/defalias FileInsertQuery
+#_:clj-kondo/ignore
+(t/defalias FileCreateQuery
   (t/HMap
     :mandatory {:model  ':files
-                :action ':insert
+                :action ':create
                 :title  t/Str}
     :optional {:fields             FieldList
                :description        t/Str
@@ -118,6 +129,7 @@
                :content-length     t/Int}
     :complete? true))
 
+#_:clj-kondo/ignore
 (t/defalias FileUpdateQuery
   (t/HMap
     :mandatory {:model   ':files
@@ -135,6 +147,7 @@
                :content-length     t/Int}
     :complete? true))
 
+#_:clj-kondo/ignore
 (t/defalias PermissionListQuery
   (t/HMap
     :mandatory {:model   ':permissions
@@ -143,6 +156,7 @@
     :optional {:fields FieldList}
     :complete? true))
 
+#_:clj-kondo/ignore
 (t/defalias PermissionDeleteQuery
   (t/HMap
     :mandatory {:model         ':permissions
@@ -151,10 +165,11 @@
                 :permission-id PermissionId}
     :complete? true))
 
-(t/defalias PermissionInsertQuery
+#_:clj-kondo/ignore
+(t/defalias PermissionCreateQuery
   (t/HMap
     :mandatory {:model   ':permissions
-                :action  ':insert
+                :action  :create
                 :file-id FileId
                 :role    Role
                 :type    PermissionType
@@ -164,6 +179,7 @@
                :fields     FieldList}
     :complete? true))
 
+#_:clj-kondo/ignore
 (t/defalias PermissionUpdateQuery
   (t/HMap
     :mandatory {:model         ':permissions
@@ -175,29 +191,32 @@
                :transfer-ownership? t/Bool}
     :complete? true))
 
+#_:clj-kondo/ignore
 (t/defalias Query
   (t/U FileDeleteQuery
        FileGetQuery
-       FileInsertQuery
+       FileCreateQuery
        FileListQuery
        FileUpdateQuery
        PermissionDeleteQuery
-       PermissionInsertQuery
+       PermissionCreateQuery
        PermissionListQuery
        PermissionUpdateQuery))
 
+#_:clj-kondo/ignore
 (t/defalias Request
   (t/U Drive$Files$List
        Drive$Files$Get
-       Drive$Files$Insert
+       Drive$Files$Create
        Drive$Files$Update
        Drive$Files$Delete
        Drive$Permissions$List
-       Drive$Permissions$Insert
+       Drive$Permissions$Create
        Drive$Permissions$Update
        Drive$Permissions$Delete))
 
 ;Return type when invoking `.execute` on one of the `Request` types, above
+#_:clj-kondo/ignore
 (t/defalias ResponseRaw
   (t/U nil
        File
@@ -206,6 +225,7 @@
        PermissionList))
 
 ;A processed response
+#_:clj-kondo/ignore
 (t/defalias ResponseData
   (t/U nil
        File
@@ -213,6 +233,7 @@
        (java.util.List File)
        (java.util.List Permission)))
 
+#_:clj-kondo/ignore
 (t/defalias QueryResult
   (t/U (t/Seqable QueryResult)
        (t/HMap)
@@ -227,27 +248,24 @@
 
 ;; Helper methods
 
-(t/ann build-file [(t/U FileInsertQuery FileUpdateQuery) -> File])
-(defn- ^File build-file
-  [query]
+#_:clj-kondo/ignore
+(t/ann -build-file [(t/U FileCreateQuery FileUpdateQuery) -> File])
+(defn -build-file
+  ^File [query]
   (let [{:keys [description mime-type parent-ids title writers-can-share?]} query
-        parents (when (seq parent-ids)
-                  (map (t/fn [id :- FolderId]
-                         (doto (ParentReference.)
-                           (.setId id)))
-                       parent-ids))
         file (new File)]
     (when description (.setDescription file description))
     (when mime-type (.setMimeType file mime-type))
-    (when parents (.setParents file parents))
+    (when (.setParents file parent-ids) parents)
     (when title (.setTitle file title))
     (when (bool? writers-can-share?) (.setWritersCanShare file (boolean writers-can-share?)))
     ;result is a file returned to the user
     file))
 
 
-(t/ann build-stream [(t/U FileInsertQuery FileUpdateQuery) -> (t/Option InputStreamContent)])
-(defn- build-stream
+#_:clj-kondo/ignore
+(t/ann -build-stream [(t/U FileCreateQuery FileUpdateQuery) -> (t/Option InputStreamContent)])
+(defn -build-stream
   [query]
   (when-let [content (:content query)]
     (let [mime-type (:mime-type query)
@@ -259,9 +277,10 @@
 
 
 ;TODO: should this logic get pushed out into the individual `*->DriveRequest` methods?
-(t/ann format-fields-string [Query -> (t/Option t/Str)])
-(defn- ^String format-fields-string
-  [qmap]
+#_:clj-kondo/ignore
+(t/ann -format-fields-string [Query -> (t/Option t/Str)])
+(defn -format-fields-string
+  ^String [qmap]
   (let [{:keys [model action fields]} qmap
         ; TODO more rigorous support for nesting, e.g. permissions(role,type)
         fields (when (seq fields) (string/join "," (map name fields)))
@@ -274,8 +293,9 @@
         fields (when (seq fields-seq) (string/join "," fields-seq))]
     fields))
 
-(t/ann guess-principal-type [(t/Option t/Str) -> PermissionType])
-(defn- guess-principal-type
+#_:clj-kondo/ignore
+(t/ann -guess-principal-type [(t/Option t/Str) -> PermissionType])
+(defn -guess-principal-type
   [^String principal]
   (cond
     (nil? principal) nil
@@ -284,7 +304,7 @@
     (> (.indexOf principal "@") 0) :user
     :else :domain))
 
-(defn- derive-principal
+(defn -derive-principal
   [permission]
   (let [{:keys [type email-address domain]} permission]
     (case type
@@ -294,21 +314,23 @@
       "user" email-address)))
 
 
+#_:clj-kondo/ignore
 (t/ann permission-has-principal? [(t/Option t/Str) t/Any -> t/Bool])
 (defn permission-has-principal?
   [^String principal, permission]
   (let [perm-type (:type permission)]
-    (case (guess-principal-type principal)
+    (case (-guess-principal-type principal)
       :user (and (= principal (:email-address permission))
                  (or (= "user" perm-type) (= "group" perm-type)))
       :domain (and (= principal (:domain permission))
                    (= "domain" perm-type))
-      :anyone (and (= "anyone" perm-type))
+      :anyone (= "anyone" perm-type)
       false)))
 
 
 ;; Deleting a single file
 
+#_:clj-kondo/ignore
 (t/ann file-delete-query [FileId -> FileDeleteQuery])
 (defn file-delete-query
   [file-id]
@@ -316,6 +338,7 @@
    :action  :delete
    :file-id file-id})
 
+#_:clj-kondo/ignore
 (t/ann FileDeleteQuery->DriveRequest [Drive FileDeleteQuery -> Drive$Files$Delete])
 (defn FileDeleteQuery->DriveRequest
   [^Drive drive-service, qmap]
@@ -325,12 +348,14 @@
 
 ;; Listing files
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check file-list-query (t/IFn [-> FileListQuery] [(t/HMap) -> FileListQuery]))
 (defn file-list-query
   ([] (file-list-query {}))
   ([extras]
    (merge extras {:model :files, :action :list})))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check folder-list-files-query (t/IFn [FolderId -> FileListQuery] [FolderId (t/HMap) -> FileListQuery]))
 (defn folder-list-files-query
   ([folder-id] (folder-list-files-query folder-id {}))
@@ -338,6 +363,7 @@
    (file-list-query (merge extras {:query (format "'%s' in parents" folder-id)}))))
 
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check all-files-query (t/IFn [-> FileListQuery] [(t/HMap) -> FileListQuery]))
 (defn all-files-query
   ([] (all-files-query {}))
@@ -348,18 +374,20 @@
                  "parents(id)"]]
      (file-list-query (merge {:fields fields :query "trashed=false"} extras)))))
 
+#_:clj-kondo/ignore
 (t/ann FileListQuery->DriveRequest [Drive FileListQuery -> Drive$Files$List])
 (defn FileListQuery->DriveRequest
   [^Drive drive-service, qmap]
   (let [files-service (.files drive-service)
         request (.list files-service)]
     (when-let [query (:query qmap)] (.setQ request query))
-    (when-let [fields (format-fields-string qmap)] (.setFields request fields))
+    (when-let [fields (-format-fields-string qmap)] (.setFields request fields))
     request))
 
 
 ;; Grabbing a single file
 
+#_:clj-kondo/ignore
 (t/ann file-get-query [FileId -> FileGetQuery])
 (defn file-get-query
   [file-id]
@@ -367,62 +395,67 @@
    :action  :get
    :file-id file-id})
 
+#_:clj-kondo/ignore
 (t/ann FileGetQuery->DriveRequest [Drive FileGetQuery -> Drive$Files$Get])
 (defn FileGetQuery->DriveRequest
   [^Drive drive-service, qmap]
   (let [files-service (.files drive-service)
         request (.get files-service (:file-id qmap))]
-    (when-let [fields (format-fields-string qmap)] (.setFields request fields))
+    (when-let [fields (-format-fields-string qmap)] (.setFields request fields))
     request))
 
 
-;; Inserting (uploading) a single file or folder
+;; Creating (uploading) a single file or folder
 
-(t/ann ^:no-check file-insert-query [FolderId FileUploadContent t/Str (t/HMap) -> FileInsertQuery])
-(defn file-insert-query
+#_:clj-kondo/ignore
+(t/ann ^:no-check file-create-query [FolderId FileUploadContent t/Str (t/HMap) -> FileCreateQuery])
+(defn file-create-query
   [folder-id content file-title {:keys [mime-type convert?] :as extra-args}]
   (merge extra-args
          {:model      :files
-          :action     :insert
+          :action     :create
           :parent-ids [folder-id]
           :title      file-title
           :convert?   (if (bool? convert?) convert? (some? mime-type))
           :content    content}))
 
-(t/ann FileInsertQuery->DriveRequest [Drive FileInsertQuery -> Drive$Files$Insert])
-(defn FileInsertQuery->DriveRequest
+#_:clj-kondo/ignore
+(t/ann FileCreateQuery->DriveRequest [Drive FileCreateQuery -> Drive$Files$Create])
+(defn FileCreateQuery->DriveRequest
   [^Drive drive-service, qmap]
-  (let [file (build-file qmap)
-        stream (build-stream qmap)
+  (let [file (-build-file qmap)
+        stream (-build-stream qmap)
         convert? (boolean (get-in qmap [:convert?] true))
         files-service (.files drive-service)
         request (if stream
-                  (doto (.insert files-service file stream)
+                  (doto (.create files-service file stream)
                     (.setConvert convert?))
-                  (.insert files-service file))]
+                  (.create files-service file))]
     ;Allow direct upload, which is more efficient for tiny files
     ;https://developers.google.com/api-client-library/java/google-api-java-client/media-upload#direct
     (when (:direct-upload? qmap)
       (when-let [uploader (.getMediaHttpUploader request)]
         (.setDirectUploadEnabled uploader true)))
-    (when-let [fields (format-fields-string qmap)] (.setFields request fields))
+    (when-let [fields (-format-fields-string qmap)] (.setFields request fields))
     request))
 
 
 ;; Helpers for dealing with folders
 ;; See also https://developers.google.com/drive/v3/web/folder
 
+#_:clj-kondo/ignore
 (t/ann folder? [(t/HMap :mandatory {:mime-type t/Str}) -> t/Bool])
 (defn folder?
   "Predicate fn indicating if the given file map has the folder mime type"
   [file-map]
   (= gdrive-mime/folder (:mime-type file-map)))
 
-(t/ann folder-insert-query [FolderId t/Str -> FileInsertQuery])
-(defn folder-insert-query
+#_:clj-kondo/ignore
+(t/ann folder-create-query [FolderId t/Str -> FileCreateQuery])
+(defn folder-create-query
   [parent-id title]
   {:model      :files
-   :action     :insert
+   :action     :create
    :parent-ids [parent-id]
    :mime-type  gdrive-mime/folder
    :title      title})
@@ -430,6 +463,7 @@
 
 ;; Updating a single file (either moving it, or changing contents, or potentially both)
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check file-update-query [FileId (t/HMap) -> FileUpdateQuery])
 (defn file-update-query
   [file-id extra-args]
@@ -439,12 +473,13 @@
           :file-id  file-id
           :convert? (boolean (:convert? extra-args))}))
 
+#_:clj-kondo/ignore
 (t/ann FileUpdateQuery->DriveRequest [Drive FileUpdateQuery -> Drive$Files$Update])
 (defn FileUpdateQuery->DriveRequest
   [^Drive drive-service, qmap]
-  (let [file (build-file qmap)
+  (let [file (-build-file qmap)
         file-id (:file-id qmap)
-        stream (build-stream qmap)
+        stream (-build-stream qmap)
         convert? (boolean (get-in qmap [:convert?] false))
         files-service (.files drive-service)
         request (if stream
@@ -456,10 +491,11 @@
     (when (:direct-upload? qmap)
       (when-let [uploader (.getMediaHttpUploader request)]
         (.setDirectUploadEnabled uploader true)))
-    (when-let [fields (format-fields-string qmap)] (.setFields request fields))
+    (when-let [fields (-format-fields-string qmap)] (.setFields request fields))
     request))
 
 
+#_:clj-kondo/ignore
 (t/ann file-move-query [FolderId FileId -> FileUpdateQuery])
 (defn file-move-query
   [folder-id file-id]
@@ -467,6 +503,7 @@
 
 ;; Enumerating permissions on a file/folder
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check permission-list-query (t/IFn [FileId -> PermissionListQuery]
                                                [FileId (t/HMap) -> PermissionListQuery]))
 (defn permission-list-query
@@ -477,33 +514,36 @@
             (or extra-params {})
             {:model :permissions :action :list}))))
 
+#_:clj-kondo/ignore
 (t/ann PermissionListQuery->DriveRequest [Drive PermissionListQuery -> Drive$Permissions$List])
 (defn PermissionListQuery->DriveRequest
   [^Drive drive-service, qmap]
   (let [file-id (:file-id qmap)
         request (.list (.permissions drive-service) file-id)]
-    (when-let [fields (format-fields-string qmap)] (.setFields request fields))
+    (when-let [fields (-format-fields-string qmap)] (.setFields request fields))
     request))
 
 ;; Adding a permission to a file/folder
 
-(t/ann ^:no-check permission-insert-query (t/IFn [FileId t/Str Role -> PermissionInsertQuery]
-                                                 [FileId t/Str Role (t/HMap) -> PermissionInsertQuery]))
-(defn permission-insert-query
+#_:clj-kondo/ignore
+(t/ann ^:no-check permission-create-query (t/IFn [FileId t/Str Role -> PermissionCreateQuery]
+                                                 [FileId t/Str Role (t/HMap) -> PermissionCreateQuery]))
+(defn permission-create-query
   ([file-id principal role]
-   (permission-insert-query file-id principal role {}))
+   (permission-create-query file-id principal role {}))
   ([file-id principal role extra-params]
    (merge extra-params
           {:model   :permissions
-           :action  :insert
+           :action  :create
            :file-id file-id
            :value   principal
            :role    role
-           :type    (guess-principal-type principal)})))
+           :type    (-guess-principal-type principal)})))
 
 
-(t/ann PermissionInsertQuery->DriveRequest [Drive PermissionInsertQuery -> Drive$Permissions$Insert])
-(defn PermissionInsertQuery->DriveRequest
+#_:clj-kondo/ignore
+(t/ann PermissionCreateQuery->DriveRequest [Drive PermissionCreateQuery -> Drive$Permissions$Create])
+(defn PermissionCreateQuery->DriveRequest
   [^Drive drive-service qmap]
   (let [{:keys [file-id value role type with-link? email?]} qmap
         permission (new Permission)]
@@ -514,14 +554,15 @@
     (when (some? with-link?) (.setWithLink permission (boolean with-link?)))
     ;now make the request
     (let [permission-svc (.permissions drive-service)
-          request (.insert permission-svc file-id permission)]
+          request (.create permission-svc file-id permission)]
       (cond-> request email? (.setSendNotificationEmails true))
-      (when-let [fields (format-fields-string qmap)]
+      (when-let [fields (-format-fields-string qmap)]
         (.setFields request fields))
       request)))
 
 ;; Alter a permission on a file/folder
 
+#_:clj-kondo/ignore
 (t/ann permission-update-query (t/IFn [FileId PermissionId Role -> PermissionUpdateQuery]
                                       [FileId PermissionId Role (t/HMap) -> PermissionUpdateQuery]))
 (defn ^:no-check permission-update-query
@@ -535,6 +576,7 @@
            :permission-id permission-id
            :role          role})))
 
+#_:clj-kondo/ignore
 (t/ann PermissionUpdateQuery->DriveRequest [Drive PermissionUpdateQuery -> Drive$Permissions$Update])
 (defn PermissionUpdateQuery->DriveRequest
   [^Drive drive-service, qmap]
@@ -546,12 +588,13 @@
     (let [permission-svc (.permissions drive-service)
           request (.update permission-svc file-id permission-id permission)]
       (when (some? transfer-ownership?) (.setTransferOwnership request (boolean transfer-ownership?)))
-      (when-let [fields (format-fields-string qmap)] (.setFields request fields))
+      (when-let [fields (-format-fields-string qmap)] (.setFields request fields))
       request)))
 
 
 ;; Removing a single permission from a single file/folder
 
+#_:clj-kondo/ignore
 (t/ann permission-delete-query [FileId PermissionId -> PermissionDeleteQuery])
 (defn permission-delete-query
   [file-id permission-id]
@@ -560,6 +603,7 @@
    :file-id       file-id
    :permission-id permission-id})
 
+#_:clj-kondo/ignore
 (t/ann PermissionDeleteQuery->DriveRequest [Drive PermissionDeleteQuery -> Drive$Permissions$Delete])
 (defn PermissionDeleteQuery->DriveRequest
   [^Drive drive-service, qmap]
@@ -569,11 +613,12 @@
 
 
 
+#_:clj-kondo/ignore
 (t/ann build-drive-service [cred/GoogleAuth -> Drive])
-(defn ^Drive build-drive-service
+(defn build-drive-service
   "Given a google-ctx configuration map, builds a Drive service using
    credentials coming from the OAuth2.0 credential setup inside google-ctx"
-  [google-ctx]
+  ^Drive [google-ctx]
   (let [drive-builder (->> google-ctx
                            cred/build-credential
                            (Drive$Builder. cred/http-transport cred/json-factory))]
@@ -583,39 +628,58 @@
                   assert))))
 
 
-(t/ann ^:no-check Query->DriveRequest [Drive Query -> Request])
-(defn- Query->DriveRequest
+#_:clj-kondo/ignore
+(t/ann ^:no-check -Query->DriveRequest [Drive Query -> Request])
+(defn -Query->DriveRequest
   "Converts a Query map into an instance of DriveRequest.  All Query maps have at least
   a `:model` and an `:action` key describing the type of operation that they represent.
   The exact class returned depends on the `:model` and `:action` keys of the Query map,
   but all returend classes are ones that implement DriveRequest."
   [drive-service query]
-  (t/let [model :- t/Kw (:model query)
-          action :- t/Kw (:action query)]
+  #_(t/let [model :- t/Kw (:model query)
+            action :- t/Kw (:action query)]
+      (case model
+        :files
+        (case action
+          :list (FileListQuery->DriveRequest drive-service query)
+          :get (FileGetQuery->DriveRequest drive-service query)
+          :create (FileCreateQuery->DriveRequest drive-service query)
+          :update (FileUpdateQuery->DriveRequest drive-service query)
+          :delete (FileDeleteQuery->DriveRequest drive-service query))
+        :permissions
+        (case action
+          :list (PermissionListQuery->DriveRequest drive-service query)
+          :create (PermissionCreateQuery->DriveRequest drive-service query)
+          :update (PermissionUpdateQuery->DriveRequest drive-service query)
+          :delete (PermissionDeleteQuery->DriveRequest drive-service query))))
+  (let [model (:model query)
+          action (:action query)]
     (case model
       :files
       (case action
         :list (FileListQuery->DriveRequest drive-service query)
         :get (FileGetQuery->DriveRequest drive-service query)
-        :insert (FileInsertQuery->DriveRequest drive-service query)
+        :create (FileCreateQuery->DriveRequest drive-service query)
         :update (FileUpdateQuery->DriveRequest drive-service query)
         :delete (FileDeleteQuery->DriveRequest drive-service query))
       :permissions
       (case action
         :list (PermissionListQuery->DriveRequest drive-service query)
-        :insert (PermissionInsertQuery->DriveRequest drive-service query)
+        :create (PermissionCreateQuery->DriveRequest drive-service query)
         :update (PermissionUpdateQuery->DriveRequest drive-service query)
         :delete (PermissionDeleteQuery->DriveRequest drive-service query)))))
 
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check response-data [ResponseRaw -> ResponseData])
 (defn response-data
   [response]
   (cond
     (instance? FileList response) (.getItems ^FileList response)
     (instance? PermissionList response) (.getItems ^PermissionList response)
-    :otherwise response))
+    :else response))
 
+#_:clj-kondo/ignore
 (t/ann next-page! [DriveRequest ResponseRaw -> (t/Option Request)])
 (defn next-page!
   [request response]
@@ -628,11 +692,12 @@
       (.setPageToken ^Drive$Files$List request page-token)
       request)
     ;nothing else has a notion of having a "next" page
-    :otherwise nil))
+    :else nil))
 
 
-(t/ann ^:no-check camel->kebab [t/Str -> t/Str])
-(defn- camel->kebab
+#_:clj-kondo/ignore
+(t/ann ^:no-check -camel->kebab [t/Str -> t/Str])
+(defn -camel->kebab
   [^String camel]
   (let [expander (fn [^StringBuffer buf, ^Character ch]
                    (let [lc (Character/toLowerCase ch)]
@@ -645,6 +710,7 @@
     (.toString ^StringBuffer expanded)))
 
 
+#_:clj-kondo/ignore
 (t/ann
   ^:no-check convert-response
   (t/IFn [java.util.Collection -> (t/Seqable QueryResult)]
@@ -670,14 +736,15 @@
       ;rewrite map keys as kebob keywords
       java.util.Map (->> (keys pojo)
                          (map (fn [^String k]
-                                [(if (string? k) (keyword (camel->kebab k)) k)
+                                [(if (string? k) (keyword (-camel->kebab k)) k)
                                  (convert-response (get pojo k))]))
                          (into {}))
       ;otherwise just pass through pojo unaltered
       pojo)))
 
-(t/ann ^:no-check rate-limit-exceeded? [GoogleJsonError -> t/Bool])
-(defn- rate-limit-exceeded?
+#_:clj-kondo/ignore
+(t/ann ^:no-check -rate-limit-exceeded? [GoogleJsonError -> t/Bool])
+(defn -rate-limit-exceeded?
   [^GoogleJsonError error]
   (and (= 403 (.getCode error))
        (some (fn [^GoogleJsonError$ErrorInfo error]
@@ -689,6 +756,7 @@
              (.getErrors error))))
 
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check execute-query! [cred/GoogleAuth Query -> QueryResult])
 (defn execute-query!
   "Executes the given query in the google context and returns the
@@ -696,7 +764,7 @@
    all results are fetched and concatenated into a vector."
   [google-ctx query]
   (let [drive-service (build-drive-service google-ctx)
-        request (Query->DriveRequest drive-service query)
+        request (-Query->DriveRequest drive-service query)
         results (atom nil)]
     (loop []
       (let [response (.execute ^DriveRequest request)
@@ -711,6 +779,7 @@
                              data))))))
     @results))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check execute-batch! [cred/GoogleAuth (t/Seqable Query) -> (t/Seqable QueryResult)])
 (defn execute-batch!
   "Execute the given queries in a batch, returning their responses,
@@ -727,7 +796,7 @@
   [google-ctx queries]
   ;; TODO partition queries into batches?
   (let [drive-service (build-drive-service google-ctx)
-        requests (map (partial Query->DriveRequest drive-service) queries)
+        requests (map (partial -Query->DriveRequest drive-service) queries)
         credential (cred/build-credential google-ctx)
         batch (BatchRequest. cred/http-transport credential)
         responses (atom (into [] (repeat (count requests) nil)))]
@@ -736,7 +805,7 @@
         (doseq [[i ^DriveRequest request] requests]
           (.queue request batch GoogleJsonErrorContainer
                   (reify BatchCallback
-                    (onSuccess [_ response headers]
+                    (onSuccess [_ response _]
                       (let [data (convert-response (response-data response))]
                         (if (next-page! request response)
                           (do
@@ -753,9 +822,9 @@
                                                     (into extant data)
                                                     data)]
                                      (assoc responses i response)))))))
-                    (onFailure [_ container headers]
+                    (onFailure [_ container _]
                       (let [error (.getError ^GoogleJsonErrorContainer container)]
-                        (if (rate-limit-exceeded? error)
+                        (if (-rate-limit-exceeded? error)
                           (do
                             (Thread/sleep (+ 100 (rand-int 100)))
                             (swap! next-requests assoc i request))
@@ -766,6 +835,7 @@
             (recur next-requests)))))
     @responses))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check execute! [cred/GoogleAuth (t/Seqable Query) -> (t/Seqable QueryResult)])
 (defn execute!
   "Executes the given queries in the most efficient way, returning their
@@ -780,6 +850,7 @@
 
 ;;;; Commands and their helpers
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check get-permissions! (t/IFn [cred/GoogleAuth FileId -> QueryResult]
                                           [cred/GoogleAuth FileId (t/Option t/Str) -> QueryResult]))
 (defn get-permissions!
@@ -795,6 +866,7 @@
        permissions))))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann ^:no-check summarize-permissions [(t/Seqable (t/HMap)) -> (t/HMap)])
 (defn summarize-permissions
   "Returns a map of the sets of principals in the given permissions grouped by
@@ -803,11 +875,12 @@
   (reduce (fn [accum permission]
             (let [{:keys [role]} permission]
               (update-in accum [role] (fnil conj #{})
-                         (derive-principal permission))))
+                         (-derive-principal permission))))
           {}
           permissions))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann ^:no-check assign! [cred/GoogleAuth FileId (t/HMap) -> (t/HMap)])
 (defn assign!
   "Authorize the principal with the role on the given file. The principal will
@@ -817,7 +890,7 @@
 
    If the principal has any other permissions, they will be deleted. If the
    principal has permission for this authorization already, it will be left
-   intact, otherwise a new permission will be inserted.
+   intact, otherwise a new permission will be created.
 
    This operation should be idempotent until the the permissions change by some
    other operation."
@@ -835,14 +908,15 @@
         (reset! principal-id (:id permission))
         (swap! ids-to-delete conj (:id permission))))
     (let [deletes (map (partial permission-delete-query file-id) @ids-to-delete)
-          insert (when-not @principal-id (permission-insert-query file-id principal role {:email? email?
+          create (when-not @principal-id (permission-create-query file-id principal role {:email? email?
                                                                                           :with-link? searchable? :fields [:id]}))]
       (execute! google-ctx deletes)
-      (when insert
-        (execute-query! google-ctx insert)))
+      (when create
+        (execute-query! google-ctx create)))
     nil))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann ^:no-check revoke! [cred/GoogleAuth FileId t/Str -> nil])
 (defn revoke!
   "Revoke all authorizations for the given principal on the given file. The
@@ -860,13 +934,15 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann create-folder! [cred/GoogleAuth FolderId t/Str -> QueryResult])
 (defn create-folder!
   "Create a folder with the given title in the given parent folder"
   [google-ctx parent-id title]
-  (execute-query! google-ctx (folder-insert-query parent-id title)))
+  (execute-query! google-ctx (folder-create-query parent-id title)))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann move-file! [cred/GoogleAuth FolderId FileId -> QueryResult])
 (defn move-file!
   "Moves a file to a folder. This returns true if successful, false
@@ -881,6 +957,8 @@
       false)))
 
 
+#_:clj-kondo/ignore
+#_:clj-kondo/ignore
 (t/ann upload-file! (t/IFn [cred/GoogleAuth t/Str t/Any t/Str -> t/Any]
                            [cred/GoogleAuth t/Str t/Any t/Str (t/HMap) -> t/Any]))
 (defn upload-file!
@@ -889,10 +967,12 @@
   ([google-auth folder-id content file-title]
    (upload-file! google-auth folder-id content file-title {}))
   ([google-auth folder-id content file-title extra-args]
-   (let [query-map (file-insert-query folder-id content file-title extra-args)]
+   (let [query-map (file-create-query folder-id content file-title extra-args)]
      (execute-query! google-auth query-map))))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
+#_:clj-kondo/ignore
 (t/ann ^:no-check download-file! (t/IFn [cred/GoogleAuth (t/HMap) -> QueryResult]
                                         [cred/GoogleAuth (t/HMap) (t/Option t/Str) -> QueryResult]))
 (defn download-file!
@@ -916,11 +996,12 @@
                  get-request (.buildGetRequest http-request gurl)
                  response (.execute get-request)]
              (.getContent response)))
-         (when-let [url (:download-url file)]
+         (when (:download-url file)
            (.executeMediaAsInputStream (.get files-svc ^String (:id file)))))))))
 
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann delete-file! [cred/GoogleAuth FileId -> QueryResult])
 (defn delete-file!
   "Permanently deletes the given file. If the file is a folder, this also
@@ -929,6 +1010,7 @@
   (execute-query! google-ctx (file-delete-query file-id)))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann list-files! (t/IFn [cred/GoogleAuth FolderId -> QueryResult]
                           [cred/GoogleAuth FolderId (t/HMap) -> QueryResult]))
 (defn list-files!
@@ -939,6 +1021,7 @@
    (execute-query! google-ctx (folder-list-files-query folder-id extras))))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann get-file! [cred/GoogleAuth FileId -> QueryResult])
 (defn get-file!
   "Returns the metadata for the given file"
@@ -946,6 +1029,7 @@
   (execute-query! google-ctx (file-get-query file-id)))
 
 ;TODO: better annotations
+#_:clj-kondo/ignore
 (t/ann ^:no-check find-file! (t/IFn [cred/GoogleAuth FolderId (t/Seqable t/Str) -> QueryResult]
                                     [cred/GoogleAuth FolderId (t/Seqable t/Str) (t/Option FieldList) -> QueryResult]))
 (defn find-file!
@@ -970,8 +1054,7 @@
                             :query  q}
                            (seq fields)
                            (assoc :fields fields))
-             results (execute-query! google-ctx query)
-             total (count results)]
+             results (execute-query! google-ctx query)]
          (when (seq results)
            (when (seq (rest results))
              (let [msg (format "Can't resolve path %s, too many matches for %s"

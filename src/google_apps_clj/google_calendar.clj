@@ -1,8 +1,6 @@
 (ns google-apps-clj.google-calendar
   (:require [clojure.core.typed :as t]
             [clojure.core.typed.unsafe :as tu]
-            [clojure.edn :as edn :only [read-string]]
-            [clojure.java.io :as io :only [as-url file resource]]
             [google-apps-clj.credentials :as cred])
   (:import (com.google.api.client.util DateTime)
            (com.google.api.services.calendar.model Event
@@ -10,10 +8,9 @@
                                                    EventDateTime Events)
            (com.google.api.services.calendar Calendar
                                              Calendar$Builder
-                                             Calendar$Events$Insert
-                                             CalendarScopes)
-           (com.google.api.client.googleapis.auth.oauth2 GoogleCredential)))
+)))
 
+#_:clj-kondo/ignore
 (t/ann build-calendar-service [cred/GoogleAuth -> Calendar])
 (defn build-calendar-service
   "Given a google-ctx configuration map, builds a Calendar service using
@@ -25,8 +22,9 @@
     (cast Calendar (doto (.build calendar-builder)
                      assert))))
 
-(t/ann add-calendar-event [cred/GoogleAuth String String String String String (t/Coll String) Boolean -> Event])
-(defn- add-calendar-event
+#_:clj-kondo/ignore
+(t/ann -add-calendar-event [cred/GoogleAuth String String String String String (t/Coll String) Boolean -> Event])
+(defn -add-calendar-event
   "Given a google-ctx configuration map, a title, a description, a location, a start and
    end time (in either YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS(+ or - hours off GMT like 4:00)),
    a list of attendees email addresses, and whether this event is in day format or time format,
@@ -63,6 +61,7 @@
     (cast Event (doto (.execute insert-request)
                   assert))))
 
+#_:clj-kondo/ignore
 (t/ann add-calendar-time-event [cred/GoogleAuth String String String String String (t/Coll String) -> Event])
 (defn add-calendar-time-event
   "Given a google-ctx configuration map, a title, a description, a location,
@@ -70,16 +69,18 @@
    and a list of attendees email addresses, creates a calendar event by calling
    add-calendar-event as a time event"
   [google-ctx title description location start-time end-time attendees]
-  (add-calendar-event google-ctx title description location start-time end-time attendees false))
+  (-add-calendar-event google-ctx title description location start-time end-time attendees false))
 
+#_:clj-kondo/ignore
 (t/ann add-calendar-day-event [cred/GoogleAuth String String String String String (t/Coll String) -> Event])
 (defn add-calendar-day-event
   "Given a google-ctx configuration map, a title, a description, a location,
    a start and end time (in YYYY-MM-DD), and a list of attendees email addresses,
    creates a calendar event by calling add-calendar-event as an all day event"
   [google-ctx title description location start-time end-time attendees]
-  (add-calendar-event google-ctx title description location start-time end-time attendees true))
+  (-add-calendar-event google-ctx title description location start-time end-time attendees true))
 
+#_:clj-kondo/ignore
 (t/ann list-events [cred/GoogleAuth String String -> (t/Seq Event)])
 (defn list-events
   "Given a google-ctx configuration map, a start time and an end time
@@ -99,10 +100,12 @@
                       (.setSingleEvents true))
         days-events (doto (.execute list-events)
                       assert)]
+    #_:clj-kondo/ignore
     (tu/ignore-with-unchecked-cast (doto (.getItems ^Events days-events)
                                      assert)
                                    (t/Seq Event))))
 
+#_:clj-kondo/ignore
 (t/ann list-day-events [cred/GoogleAuth String String -> (t/Seq Event)])
 (defn list-day-events
   "Given a google-ctx configuration map, a day in the form(YYYY-MM-DD),
@@ -113,6 +116,7 @@
         end-time (str day "T23:59:59" time-zone-offset ":00")]
     (list-events google-ctx start-time end-time)))
 
+#_:clj-kondo/ignore
 (t/ann list-events-by-name [cred/GoogleAuth String Number -> (t/Seq Event)])
 (defn list-events-by-name
   "Given a google-ctx configuration map, a title that will be the query
@@ -133,6 +137,7 @@
                       (.setSingleEvents true))
         days-events (doto (.execute list-events)
                       assert)]
+    #_:clj-kondo/ignore
     (tu/ignore-with-unchecked-cast (doto (.getItems ^Events days-events)
                                      assert)
                                    (t/Seq Event))))

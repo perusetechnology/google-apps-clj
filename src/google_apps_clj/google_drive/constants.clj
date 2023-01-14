@@ -2,6 +2,7 @@
   "Documentation of miscellaneous Google Drive constants"
   (:require [clojure.core.typed :as t]))
 
+#_:clj-kondo/ignore
 (t/def batch-size
   "Google internally unwraps batches and processes them concurrently. Batches
    that are too large can cause the request to exceed Google's api rate limit,
@@ -9,6 +10,7 @@
   :- Long
   20)
 
+#_:clj-kondo/ignore
 (t/def root-folder-id
   "The unique ID of the root folder of Google Drive"
   :- t/Str

@@ -3,14 +3,6 @@
             [clojure.string :as string]
             [google-apps-clj.credentials :as cred])
   (:import
-   (com.google.api.client.auth.oauth2 Credential)
-   (com.google.api.client.extensions.java6.auth.oauth2 AuthorizationCodeInstalledApp)
-   (com.google.api.client.extensions.jetty.auth.oauth2 LocalServerReceiver)
-   (com.google.api.client.googleapis.auth.oauth2 GoogleAuthorizationCodeFlow
-                                                 GoogleAuthorizationCodeFlow$Builder
-                                                 GoogleClientSecrets)
-   (com.google.api.client.googleapis.javanet GoogleNetHttpTransport)
-   (com.google.api.client.json.jackson2 JacksonFactory)
    (com.google.api.services.sheets.v4 SheetsScopes
                                       Sheets
                                       Sheets$Builder)
@@ -19,12 +11,9 @@
                                             BatchUpdateSpreadsheetRequest
                                             CellData
                                             CellFormat
-                                            DeleteDimensionRequest
-                                            DimensionRange
                                             ExtendedValue
                                             GridCoordinate
                                             GridProperties
-                                            InsertDimensionRequest
                                             NumberFormat
                                             Request
                                             RowData
@@ -35,28 +24,13 @@
 (def scopes
   [SheetsScopes/SPREADSHEETS])
 
-(defn ^Sheets build-service
-  ([google-ctx]
+(defn build-service
+  (^Sheets [google-ctx]
    (let [creds (cred/build-credential google-ctx)
          builder (Sheets$Builder. cred/http-transport cred/json-factory creds)]
      (doto builder
        (.setApplicationName "google-apps-clj"))
-     (.build builder)))
-  ([client-id client-secret]
-   (let [http-transport (GoogleNetHttpTransport/newTrustedTransport)
-         auth-flow (-> (GoogleAuthorizationCodeFlow$Builder. http-transport
-                                                             (JacksonFactory/getDefaultInstance)
-                                                             client-id
-                                                             client-secret
-                                                             scopes)
-                       (.setAccessType "offline")
-                       (.build))
-         credential (-> (AuthorizationCodeInstalledApp. auth-flow (LocalServerReceiver.))
-                        (.authorize nil))
-         service (-> (Sheets$Builder. http-transport (JacksonFactory/getDefaultInstance) credential)
-                     (.setApplicationName "Application test")
-                     (.build))]
-     service)))
+     (.build builder))))
 
 (defn get-spreadsheet-info
   "Returns a \"sheets\" field which contains information about a spreadsheet's
@@ -77,10 +51,10 @@
           sheets)))
 
 (defn get-sheet-titles
-  [service spreadsheet-id]
   "returns a list of [sheet-title sheet-id] tuples. It seems the order reflects
   the order of the tabs in google's interface, though I doubt this is anywhere
   guaranteed."
+  [service spreadsheet-id]
   (->> (get (get-spreadsheet-info service spreadsheet-id) "sheets")
        (map #(get % "properties"))
        (mapv (juxt #(get % "title") #(get % "sheetId")))))

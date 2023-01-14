@@ -1,13 +1,15 @@
-{:deps {org.clojure/clojure {:mvn/version "1.7.0"}
-        org.clojure/core.typed {:mvn/version "0.3.14"}
-        clj-time/clj-time {:mvn/version "0.12.2"}
-        com.google.apis/google-api-services-calendar {:mvn/version "v3-rev202-1.22.0"}
-        com.google.apis/google-api-services-drive {:mvn/version "v2-rev168-1.20.0"}
-        com.google.apis/google-api-services-sheets {:mvn/version "v4-rev12-1.22.0"}
-        com.google.oauth-client/google-oauth-client-jetty {:mvn/version "1.22.0"}
-        com.google.gdata/core {:mvn/version "1.47.1" :exclusions [org.apache.httpcomponents/httpclient
-                                                                  org.mortbay.jetty/jetty
-                                                                  com.google.code.findbugs/jsr305]}}
- :paths ["src"]
- :aliases
- {:env/test {:extra-paths ["test"]}}}
+{:aliases {:env/test {:extra-paths ["test"]}},
+ :deps {clj-time/clj-time {:mvn/version "0.12.2"},
+        com.google.apis/google-api-services-calendar {:mvn/version
+                                                        "v3-rev202-1.22.0"},
+        com.google.apis/google-api-services-drive {:mvn/version
+                                                     "v3-rev20220508-1.32.1"},
+        com.google.apis/google-api-services-sheets {:mvn/version
+                                                      "v4-rev20220411-1.32.1"},
+        com.google.gdata/core {:exclusions [org.apache.httpcomponents/httpclient
+                                            org.mortbay.jetty/jetty
+                                            com.google.code.findbugs/jsr305],
+                               :mvn/version "1.47.1"},
+        org.clojure/clojure {:mvn/version "1.11.0"},
+        org.clojure/core.typed {:mvn/version "0.3.14"}},
+ :paths ["src"]}

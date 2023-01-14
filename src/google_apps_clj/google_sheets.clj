@@ -1,8 +1,7 @@
 (ns google-apps-clj.google-sheets
   (:require [clojure.core.typed :as t]
             [clojure.core.typed.unsafe :as tu]
-            [clojure.edn :as edn :only [read-string]]
-            [clojure.java.io :as io :only [as-url file resource]]
+            [clojure.java.io :as io]
             [google-apps-clj.credentials :as cred])
   (:import (com.google.gdata.data.spreadsheet CellEntry
                                               CellFeed
@@ -24,12 +23,14 @@
                                         BatchUtils)
            (java.net URL)))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check clojure.java.io/as-url [t/Str -> URL])
 
 (def spreadsheet-url
   "The url needed and used to recieve a spreadsheet feed"
   (io/as-url "https://spreadsheets.google.com/feeds/spreadsheets/private/full"))
 
+#_:clj-kondo/ignore
 (t/ann build-sheet-service [cred/GoogleAuth -> SpreadsheetService])
 (defn build-sheet-service
   "Given a google-ctx configuration map, builds a SpreadsheetService using
@@ -51,6 +52,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;; Spreadsheet Entry Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#_:clj-kondo/ignore
 (t/ann find-spreadsheet-by-id
        [SpreadsheetService String -> (t/U '{:spreadsheet SpreadsheetEntry}
                                           '{:error (t/Val :no-entry)})])
@@ -68,6 +70,7 @@
       {:error :no-entry})))
 
 
+#_:clj-kondo/ignore
 (t/ann find-spreadsheet-by-title
        [SpreadsheetService String -> (t/U '{:spreadsheet SpreadsheetEntry}
                                           '{:error t/Keyword})])
@@ -87,6 +90,7 @@
           (< (count entries) 1) {:error :no-spreadsheet}
           :else {:error :more-than-one-spreadsheet})))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check file-name->ids [cred/GoogleAuth String -> (t/U '{:spreadsheet t/Map
                                                                   :worksheet t/Map}
                                                                 '{:error t/Keyword})])
@@ -115,6 +119,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;   Worksheet Entry Functions  ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#_:clj-kondo/ignore
 (t/ann create-new-worksheet
        [cred/GoogleAuth SpreadsheetEntry Number Number String -> WorksheetEntry])
 (defn create-new-worksheet
@@ -131,6 +136,7 @@
     (cast WorksheetEntry (doto (.insert ^SpreadsheetService sheet-service feed-url worksheet)
                            assert))))
 
+#_:clj-kondo/ignore
 (t/ann update-worksheet-row-count [WorksheetEntry Number -> WorksheetEntry])
 (defn update-worksheet-row-count
   "Given a WorksheetEntry and desired amount of rows, edit and
@@ -141,6 +147,7 @@
     (cast WorksheetEntry (doto (.update worksheet)
                            assert))))
 
+#_:clj-kondo/ignore
 (t/ann update-worksheet-col-count [WorksheetEntry Number -> WorksheetEntry])
 (defn update-worksheet-col-count
   "Given a WorksheetEntry and desired amount of columns, edit and
@@ -151,6 +158,7 @@
     (cast WorksheetEntry (doto (.update worksheet)
                            assert))))
 
+#_:clj-kondo/ignore
 (t/ann update-worksheet-all-fields [WorksheetEntry Number Number String -> WorksheetEntry])
 (defn update-worksheet-all-fields
   "Update all the fields for the given worksheet and return the new worksheet"
@@ -162,6 +170,7 @@
     (cast WorksheetEntry (doto (.update worksheet)
                            assert))))
 
+#_:clj-kondo/ignore
 (t/ann find-worksheet-by-id
        [SpreadsheetService SpreadsheetEntry String -> (t/U '{:worksheet WorksheetEntry}
                                                            '{:error (t/Val :no-entry)})])
@@ -178,6 +187,7 @@
       {:worksheet entry}
       {:error :no-entry})))
 
+#_:clj-kondo/ignore
 (t/ann find-worksheet-by-title
        [SpreadsheetService SpreadsheetEntry String -> (t/U '{:worksheet WorksheetEntry}
                                                            '{:error t/Keyword})])
@@ -202,6 +212,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;; Editing Data Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#_:clj-kondo/ignore
 (t/ann find-cell-by-row-col [SpreadsheetService WorksheetEntry Number Number -> (t/U '{:cell CellEntry}
                                                                                      '{:error t/Keyword})])
 (defn find-cell-by-row-col
@@ -227,6 +238,7 @@
           (< (count cells) 1) {:error :no-cells}
           :else {:error :more-than-one-cell})))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check update-cell
        [cred/GoogleAuth String String '[Number Number String] -> (t/U CellEntry
                                                                      '{:error t/Keyword})])
@@ -256,6 +268,7 @@
             _ (.setHeader sheet-service "If-Match" "*") ]
         (.update sheet-service cell-url cell)))))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check insert-row
        [cred/GoogleAuth String String (t/Seq (t/Map String String)) -> (t/U ListEntry
                                                                            '{:error t/Keyword})])
@@ -290,6 +303,7 @@
       (do (dorun (map update-value-by-header headers))
           (.insert sheet-service (:list-feed-url list-feed-url) row)))))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check batch-update-cells
        [cred/GoogleAuth String String (t/Seq '[Number Number String]) -> (t/U CellFeed
                                                                              '{:error t/Keyword})])
@@ -321,7 +335,7 @@
                                                 (BatchUtils/setBatchId batch-id)
                                                 (BatchUtils/setBatchOperationType BatchOperationType/UPDATE))]
                                     (-> batch-request .getEntries (.add entry))))
-            update-requests (doall (map create-update-entry cells))
+            _ (doall (map create-update-entry cells))
             cell-feed (.getFeed sheet-service cell-feed-url CellFeed)
             batch-link (.getLink cell-feed ILink$Rel/FEED_BATCH ILink$Type/ATOM)
             batch-url (io/as-url (.getHref batch-link))
@@ -332,6 +346,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;; Read and Write entire Worksheets ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check read-worksheet-headers [SpreadsheetService WorksheetEntry -> (t/Vec String)])
 (defn read-worksheet-headers
   "Given a Spreadsheet Service and a WorksheetEntry, return
@@ -352,6 +367,7 @@
                       (if (string? value) value "")))]
     (into [] (map get-value cells))))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check read-worksheet-values [SpreadsheetService WorksheetEntry -> (t/Seq (t/Vec String))])
 (defn read-worksheet-values
   "Given a SpreadsheetService, and a WorksheetEntry, reads in that worksheet and returns
@@ -368,6 +384,7 @@
                         (into [] (map #(get-value row %) (.getTags row)))))]
     (map print-value entries)))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check read-worksheet [cred/GoogleAuth String String -> (t/U '{:headers (t/Vec String)
                                                                          :values (t/Seq (t/Vec String))}
                                                                        '{:error t/Keyword})])
@@ -387,6 +404,7 @@
             values (read-worksheet-values sheet-service (:worksheet worksheet))]
         {:headers headers :values values}))))
 
+#_:clj-kondo/ignore
 (t/ann ^:no-check write-worksheet
        [cred/GoogleAuth String String '{:headers (t/Vec String)
                                       :values (t/Seq (t/Vec String))} -> (t/U '{:error t/Keyword}
@@ -410,7 +428,7 @@
             cols-needed (apply max (cons (count headers) (map count values)))
             worksheet-entry ^WorksheetEntry (:worksheet worksheet)
             worksheet-name (.getPlainText (.getTitle worksheet-entry))
-            worksheet (update-worksheet-all-fields worksheet-entry
+            _ (update-worksheet-all-fields worksheet-entry
                                                    rows-needed cols-needed worksheet-name)
             build-cell (fn [column value]
                          [(inc column) value])
